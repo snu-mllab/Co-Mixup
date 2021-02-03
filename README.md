@@ -84,3 +84,5 @@ python main.py --dataset tiny-imagenet-200 --data_dir ./data/tiny-imagenet-200 -
 ### ImageNet
 For ImageNet experiments, please refer to ```./comix-imagenet```. We also provide test code for localization and robustness experiments at ```./comix-localization```. You can also download pretrained models at ```./comix-localization```.
 
+### License
+MIT License
