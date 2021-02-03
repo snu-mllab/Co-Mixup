@@ -1,0 +1,16 @@
+experiments/*
+__pycache__/*
+.ipynb_checkpoints
+models/__pycache__/*
+moddls/*.pyc
+*.pth.tar
+*.pyc
+cifar-100-python
+*/pretrained
+*/result
+*/output
+*.out
+*/trained_models
+*.swp
+comix-localization/data/*
+!comix-localization/data/download_data.sh
