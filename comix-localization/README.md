@@ -1,4 +1,4 @@
-## Co-Mixup: Saliency Guided Joint Mixup with Supermodular Diversity (localization/robustness)
+## Co-Mixup localization and background robustness experiments
 
 ## Requirements
 * Python 3.7
