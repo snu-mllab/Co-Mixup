@@ -1,5 +1,5 @@
 # Fast ImageNet training for 100 epochs with ResNet-50
-Some parts of the codes are borrowed from ([link](https://github.com/snu-mllab/PuzzleMix/tree/master/imagenet)). Here, **we use Distributed Data Parallel (DDP)** rather than Data Parallel (DP). Note that Co-Mixup contains cpu workloads, and thus the multi-processing is effective. 
+Some parts of the codes are borrowed from ([link](https://github.com/anonymous-sushi-armadillo/fast_is_better_than_free_imagenet)). Here, **we use Distributed Data Parallel (DDP)** rather than Data Parallel (DP). Note that Co-Mixup contains cpu workloads, and thus the multi-processing is effective. 
 
 ## Requirements
 * Python 3.7
