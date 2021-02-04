@@ -108,7 +108,7 @@ parser.add_argument('--m_gamma',
 parser.add_argument('--m_thres',
                     type=float,
                     default=0.83,
-                    help='threshold for over-penalization, tau, 0.81~0,86')
+                    help='threshold for over-penalization, tau, 0.81~0.86')
 parser.add_argument('--m_thres_type',
                     type=str,
                     default='hard',
