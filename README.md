@@ -60,7 +60,7 @@ python main.py --dataset cifar100 --data_dir ./data --root_dir ./experiments/cif
 - We have built pytorch multiprocessing module for Co-Mixup. To use this, set --parallel True (default). However, this requires additional GPU memory (the more the number of partition, the more the number of processes, about 1GB GPU memory per CUDA process). If OOM occurs, set '--parallel False' or increase the number of partition size (--m_part).
 - The number of processes in dataloader (--workers) has a significant impact on training time. I set 0 for CIFAR (using only main thread) and 8 for Tiny-ImageNet.
 - To reduce training time, set --m_niter 3 (the number iterations for the outer loop of Co-Mixup).  
-- Considerable range of parameters are m_beta: [0.16, 0.48], m_thres: [0.81, 0.84].  
+- Considerable range of parameters are m_beta: [0.16, 0.48], m_thres: [0.81, 0.84] in the case of 4 block_num.  
 - Clean input regularization by --clean_lam allow us to use high --mixup_alpha. If we set --clean_lam 0, then --mixup_alpha should be decreased accordingly.
 - The codes for other baselines are provided in [link](https://github.com/snu-mllab/PuzzleMix).
 
