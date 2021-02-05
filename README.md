@@ -41,7 +41,7 @@ To test the model, run
 ```
 python main.py --evaluate --log_off --parallel False --resume ./checkpoint/cifar100_preactresnet18_eph300_comixup/checkpoint.pth.tar --data_dir ./data/cifar100/
 ```
-Note that, CIFAR-100 dataset will be downloaded at ```./data```, if the dataset dose not exist. 
+Note that, CIFAR-100 dataset will be downloaded at ```--data_dir```, if the dataset dose not exist. 
 
 ## Reproducing the results
 Detailed descriptions of arguments are provided in ```main.py```. Below are some of the examples for reproducing the experimental results. 
