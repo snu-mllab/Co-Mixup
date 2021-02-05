@@ -39,7 +39,7 @@ gdown https://drive.google.com/uc?id=1awBkSLxQKHUry-jkbDB1aMRBgIn5aT3F -O ./chec
 
 To test the model, run
 ```
-python main.py --evaluate --log_off --parallel False --resume ./checkpoint/cifar100_preactresnet18_eph300_comixup/checkpoint.pth.tar --data_dir ./data
+python main.py --evaluate --log_off --parallel False --resume ./checkpoint/cifar100_preactresnet18_eph300_comixup/checkpoint.pth.tar --data_dir ./data/cifar100/
 ```
 Note that, CIFAR-100 dataset will be downloaded at ```./data```, if the dataset dose not exist. 
 
@@ -52,7 +52,7 @@ Dataset will be downloaded at ```--data_dir``` and the results will be saved at 
 * To reproduce **Co-Mixup with PreActResNet18 for 300 epochs**, just run python main.py.  
 The detailed setting is 
 ```
-python main.py --dataset cifar100 --data_dir ./data --root_dir ./experiments/cifar100 --labels_per_class 500 --arch preactresnet18  --learning_rate 0.2 --epochs 300 --schedule 100 200 --gammas 0.1 0.1 --comix True --parallel True --m_part 20 --m_block_num 4 --mixup_alpha 2.0 --clean_lam 1.0 --m_beta 0.32 --m_gamma 1.0 --m_thres 0.83 --m_eta 0.05 --m_omega 0.001
+python main.py --dataset cifar100 --data_dir ./data/cifar100/ --root_dir ./experiments/cifar100 --labels_per_class 500 --arch preactresnet18  --learning_rate 0.2 --epochs 300 --schedule 100 200 --gammas 0.1 0.1 --comix True --parallel True --m_part 20 --m_block_num 4 --mixup_alpha 2.0 --clean_lam 1.0 --m_beta 0.32 --m_gamma 1.0 --m_thres 0.83 --m_eta 0.05 --m_omega 0.001
 ```
 
 ### Some notes
