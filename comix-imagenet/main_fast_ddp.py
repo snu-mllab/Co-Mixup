@@ -318,10 +318,8 @@ def train(rank, mpp: MixupProcessParallel, print, configs, criterion,
             z_reshape = z.reshape(configs.DATA.batch_size, -1)
             z_idx_1d = torch.argmax(z_reshape, dim=1)
             z_idx_2d = torch.zeros(configs.DATA.batch_size, 2)
-
             z_idx_2d[:, 0] = z_idx_1d // z.shape[-1]
             z_idx_2d[:, 1] = z_idx_1d % z.shape[-1]
-
             A_dist = distance(z_idx_2d, dist_type='l1').cuda()
             
             # parallel
@@ -329,7 +327,6 @@ def train(rank, mpp: MixupProcessParallel, print, configs, criterion,
                                            param_list, unary, A_dist)
 
         output = model(input)
-
         loss = torch.mean(
             torch.sum(-target_reweighted * nn.LogSoftmax(-1)(output), dim=1))
 
