@@ -28,12 +28,9 @@ gco-wrapper (https://github.com/Borda/pyGCO)
 ## Download Checkpoints and Test
 We provide Co-Mixup training log files with (PreActResNet18, CIFAR-100, 300 epochs) (see ./checkpoint). The last checkpoint shows 80.19% clean test accuracy. 
 
-To download the model, first install gdown.
+To download the model, install gdown and run
 ```
-pip install gdown
-```
-Then, run
-```
+pip install gdown  
 gdown https://drive.google.com/uc?id=1awBkSLxQKHUry-jkbDB1aMRBgIn5aT3F -O ./checkpoint/cifar100_preactresnet18_eph300_comixup/checkpoint.pth.tar
 ```
 
