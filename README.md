@@ -57,7 +57,7 @@ python main.py --dataset cifar100 --data_dir ./data/cifar100/ --root_dir ./exper
 
 ### Some notes
 - --labels_per_class controls the amounts of training data per class. To train with CIFAR-10, set --labels_per_class 5000.  
-- We have built pytorch multiprocessing module for Co-Mixup. To use this, set --parallel True (default). However, this requires additional GPU memory (the more the number of partition, the more the number of processes, about 1GB GPU memory per CUDA process). If OOM occurs, set '--parallel False' or increase the number of partition size (--m_part). One can also modify the code and use different number of partitions and processes.
+- We have built pytorch multiprocessing module for Co-Mixup. To use this, set --parallel True (default). However, this requires additional GPU memory (the more the number of partition, the more the number of processes, about 1GB GPU memory per CUDA process). If OOM occurs, set '--parallel False' or increase the number of partition size (--m_part). One can also modify the code and use different numbers of partitions and processes.
 - The number of processes in dataloader (--workers) has a significant impact on training time. I set 0 for CIFAR (using only main thread) and 8 for Tiny-ImageNet.
 - To reduce training time, set --m_niter 3 (the number iterations for the outer loop of Co-Mixup).  
 - Considerable range of parameters are m_beta: [0.16, 0.48], m_thres: [0.81, 0.84] in the case of 4 block_num.  
