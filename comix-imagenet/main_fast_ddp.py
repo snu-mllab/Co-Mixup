@@ -266,6 +266,15 @@ def train(rank, mpp: MixupProcessParallel, print, configs, criterion,
     model.train()
     end = time.time()
 
+    param_list = {
+        'mixup_alpha': configs.TRAIN.alpha,
+        'set_resolve': configs.TRAIN.set_resolve,
+        'thres': configs.TRAIN.thres,
+        'm_block_num': configs.TRAIN.block_num,
+        'lam_dist': configs.TRAIN.lam_dist,
+        'm_beta': configs.TRAIN.m_beta
+    }
+
     #pbar = tqdm(enumerate(train_loader), total=len(train_loader))
     for i, (input, target) in enumerate(train_loader):
         input = input.cuda(non_blocking=True)
@@ -314,17 +323,8 @@ def train(rank, mpp: MixupProcessParallel, print, configs, criterion,
             z_idx_2d[:, 1] = z_idx_1d % z.shape[-1]
 
             A_dist = distance(z_idx_2d, dist_type='l1').cuda()
-
-            param_list = {
-                'mixup_alpha': configs.TRAIN.alpha,
-                'set_resolve': configs.TRAIN.set_resolve,
-                'thres': configs.TRAIN.thres,
-                'm_block_num': configs.TRAIN.block_num,
-                'lam_dist': configs.TRAIN.lam_dist,
-                'm_beta': configs.TRAIN.m_beta
-            }
-
-            #@parallel
+            
+            # parallel
             input, target_reweighted = mpp(input, target_reweighted,
                                            param_list, unary, A_dist)
 
