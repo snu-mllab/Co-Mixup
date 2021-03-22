@@ -331,7 +331,7 @@ def train(rank, mpp: MixupProcessParallel, print, configs, criterion,
         output = model(input)
 
         loss = torch.mean(
-            torch.sum(-target_reweighted * nn.LogSoftmax()(output), dim=1))
+            torch.sum(-target_reweighted * nn.LogSoftmax(-1)(output), dim=1))
 
         # compute gradient and do SGD step
         if configs.TRAIN.clean_lam == 0:
