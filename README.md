@@ -58,7 +58,7 @@ python main.py --dataset cifar100 --data_dir ./data/cifar100/ --root_dir ./exper
 - The number of processes in dataloader ```--workers``` has a significant impact on training time. I set 0 for CIFAR (using only main thread) and 8 for Tiny-ImageNet.
 - To reduce training time, set ```--m_niter 3``` (the number iterations for the outer loop of Co-Mixup).  
 - Considerable ranges of parameters are m_beta: [0.16, 0.48], m_thres: [0.81, 0.84] in the case of 4 block_num.  
-- Clean input regularization by ```--clean_lam``` allow us to use high ```--mixup_alpha```. If we set --clean_lam 0, then --mixup_alpha should be decreased accordingly.
+- Clean input regularization by ```--clean_lam``` allows us to use high ```--mixup_alpha```. If we set --clean_lam 0, then --mixup_alpha should be decreased accordingly.
 - The codes for other baselines are provided in [link](https://github.com/snu-mllab/PuzzleMix).
 
 ### Tiny-Imagenet-200
