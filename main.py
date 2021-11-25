@@ -1,6 +1,7 @@
 from __future__ import division
 import os, sys, shutil, time, random
 from posix import CLD_CONTINUED
+
 sys.path.append('..')
 if sys.version_info[0] < 3:
     import cPickle as pickle
@@ -22,9 +23,9 @@ from utils import to_one_hot, distance
 from mixup import mixup_process
 from mixup_parallel import MixupProcessParallel
 
-model_names = sorted(name for name in models.__dict__
-                     if name.islower() and not name.startswith("__")
-                     and callable(models.__dict__[name]))
+model_names = sorted(
+    name for name in models.__dict__
+    if name.islower() and not name.startswith("__") and callable(models.__dict__[name]))
 
 
 def str2bool(v):
@@ -38,9 +39,8 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
-parser = argparse.ArgumentParser(
-    description='Train Classifier with mixup',
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser = argparse.ArgumentParser(description='Train Classifier with mixup',
+                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 # Data
 parser.add_argument('--dataset',
                     type=str,
@@ -72,39 +72,24 @@ parser.add_argument('--arch',
                     default='preactresnet18',
                     choices=model_names,
                     help='model architecture')
-parser.add_argument('--initial_channels',
-                    type=int,
-                    default=64,
-                    choices=(16, 64))
+parser.add_argument('--initial_channels', type=int, default=64, choices=(16, 64))
 
 # Optimization options
-parser.add_argument('--epochs',
-                    type=int,
-                    default=300,
-                    help='number of epochs to train')
+parser.add_argument('--epochs', type=int, default=300, help='number of epochs to train')
 parser.add_argument('--dropout',
                     type=str2bool,
                     default=False,
                     help='whether to use dropout or not in final layer')
 
 # Co-Mixup
-parser.add_argument('--comix',
-                    type=str2bool,
-                    default=True,
-                    help='true for Co-Mixup')
+parser.add_argument('--comix', type=str2bool, default=True, help='true for Co-Mixup')
 parser.add_argument('--m_block_num',
                     type=int,
                     default=4,
                     help='resolution of labeling, -1 for random')
 parser.add_argument('--m_part', type=int, default=20, help='partition size')
-parser.add_argument('--m_beta',
-                    type=float,
-                    default=0.32,
-                    help='label smoothness coef, 0.16~1.0')
-parser.add_argument('--m_gamma',
-                    type=float,
-                    default=1.0,
-                    help='supermodular diversity coef')
+parser.add_argument('--m_beta', type=float, default=0.32, help='label smoothness coef, 0.16~1.0')
+parser.add_argument('--m_gamma', type=float, default=1.0, help='supermodular diversity coef')
 parser.add_argument('--m_thres',
                     type=float,
                     default=0.83,
@@ -119,35 +104,20 @@ parser.add_argument('--mixup_alpha',
                     type=float,
                     default=2.0,
                     help='alpha parameter for dirichlet prior')
-parser.add_argument('--m_omega',
-                    type=float,
-                    default=0.001,
-                    help='input compatibility coef, \omega')
+parser.add_argument('--m_omega', type=float, default=0.001, help='input compatibility coef, \omega')
 parser.add_argument('--set_resolve',
                     type=str2bool,
                     default=True,
                     help='post-processing for resolving the same outputs')
-parser.add_argument('--m_niter',
-                    type=int,
-                    default=4,
-                    help='number of outer iteration')
-parser.add_argument('--clean_lam',
-                    type=float,
-                    default=1.0,
-                    help='clean input regularization')
-parser.add_argument("--parallel",
-                    type=str2bool,
-                    default=True,
-                    help="mixup_process parallelization")
+parser.add_argument('--m_niter', type=int, default=4, help='number of outer iteration')
+parser.add_argument('--clean_lam', type=float, default=1.0, help='clean input regularization')
+parser.add_argument("--parallel", type=str2bool, default=True, help="mixup_process parallelization")
 
 # training
 parser.add_argument('--batch_size', type=int, default=100)
 parser.add_argument('--learning_rate', type=float, default=0.2)
 parser.add_argument('--momentum', type=float, default=0.9)
-parser.add_argument('--decay',
-                    type=float,
-                    default=0.0001,
-                    help='weight decay (L2 penalty)')
+parser.add_argument('--decay', type=float, default=0.0001, help='weight decay (L2 penalty)')
 parser.add_argument('--schedule',
                     type=int,
                     nargs='+',
@@ -158,15 +128,10 @@ parser.add_argument(
     type=float,
     nargs='+',
     default=[0.1, 0.1],
-    help=
-    'LR is multiplied by gamma on schedule, number of gammas should be equal to schedule'
-)
+    help='LR is multiplied by gamma on schedule, number of gammas should be equal to schedule')
 
 # Checkpoints
-parser.add_argument('--print_freq',
-                    default=100,
-                    type=int,
-                    help='print frequency (default: 200)')
+parser.add_argument('--print_freq', default=100, type=int, help='print frequency (default: 200)')
 parser.add_argument('--resume',
                     default='',
                     type=str,
@@ -175,17 +140,14 @@ parser.add_argument('--start_epoch',
                     default=0,
                     type=int,
                     help='manual epoch number (useful on restarts)')
-parser.add_argument('--evaluate',
-                    action='store_true',
-                    help='evaluate model on validation set')
+parser.add_argument('--evaluate', action='store_true', help='evaluate model on validation set')
 
 # Acceleration
 parser.add_argument('--ngpu', type=int, default=1, help='0 = CPU')
-parser.add_argument(
-    '--workers',
-    type=int,
-    default=0,
-    help='number of data loader processors. 0 for CIFAR, 8 for Tiny.')
+parser.add_argument('--workers',
+                    type=int,
+                    default=0,
+                    help='number of data loader processors. 0 for CIFAR, 8 for Tiny.')
 
 # random seed
 parser.add_argument('--seed', default=0, type=int, help='manual seed')
@@ -219,8 +181,8 @@ def define_exp_name(args=args):
             args.m_beta) + '_mgamma_' + str(args.m_gamma) + '_mthres_' + str(
                 args.m_thres_type) + str(args.m_thres) + '_meta_' + str(
                     args.m_eta) + '_m_alpha_' + str(args.mixup_alpha)
-        exp_name += '_mpart_' + str(args.m_part) + '_niter_' + str(
-            args.m_niter) + '_omega_' + str(args.m_omega)
+        exp_name += '_mpart_' + str(args.m_part) + '_niter_' + str(args.m_niter) + '_omega_' + str(
+            args.m_omega)
         if args.set_resolve:
             exp_name += '_set'
     if args.clean_lam > 0:
@@ -330,8 +292,8 @@ def train(train_loader, model, optimizer, epoch, args, log, mpp=None):
             else:
                 model.train()
                 output = model(input_var)
-                loss_batch = 2 * args.clean_lam * criterion_batch(
-                    output, target_var) / args.num_classes
+                loss_batch = 2 * args.clean_lam * criterion_batch(output,
+                                                                  target_var) / args.num_classes
             loss_batch_mean = torch.mean(loss_batch, dim=0)
             loss_batch_mean.backward(retain_graph=True)
             sc = torch.sqrt(torch.mean(input_var.grad**2, dim=1))
@@ -388,8 +350,8 @@ def train(train_loader, model, optimizer, epoch, args, log, mpp=None):
         end = time.time()
 
     print_log(
-        '**Train** Prec@1 {top1.avg:.2f} Prec@5 {top5.avg:.2f} Error@1 {error1:.2f}'
-        .format(top1=top1, top5=top5, error1=100 - top1.avg), log)
+        '**Train** Prec@1 {top1.avg:.2f} Prec@5 {top5.avg:.2f} Error@1 {error1:.2f}'.format(
+            top1=top1, top5=top5, error1=100 - top1.avg), log)
     return top1.avg, top5.avg, losses.avg
 
 
@@ -420,8 +382,7 @@ def validate(val_loader, model, log):
 
     print_log(
         '**Test ** Prec@1 {top1.avg:.2f} Prec@5 {top5.avg:.2f} Error@1 {error1:.2f} Loss: {losses.avg:.3f} '
-        .format(top1=top1, top5=top5, error1=100 - top1.avg,
-                losses=losses), log)
+        .format(top1=top1, top5=top5, error1=100 - top1.avg, losses=losses), log)
 
     return top1.avg, losses.avg
 
@@ -457,11 +418,9 @@ def main():
     print_log(state, log)
     print("")
     print_log("Random Seed: {}".format(args.seed), log)
-    print_log("python version : {}".format(sys.version.replace('\n', ' ')),
-              log)
+    print_log("python version : {}".format(sys.version.replace('\n', ' ')), log)
     print_log("torch  version : {}".format(torch.__version__), log)
-    print_log("cudnn  version : {}".format(torch.backends.cudnn.version()),
-              log)
+    print_log("cudnn  version : {}".format(torch.backends.cudnn.version()), log)
 
     # Dataloader
     train_loader, _, _, test_loader, num_classes = load_data_subset(
@@ -474,30 +433,22 @@ def main():
 
     if args.dataset == 'tiny-imagenet-200':
         stride = 2
-        args.mean = torch.tensor([0.5] * 3,
-                                 dtype=torch.float32).reshape(1, 3, 1,
-                                                              1).cuda()
-        args.std = torch.tensor([0.5] * 3,
-                                dtype=torch.float32).reshape(1, 3, 1,
-                                                             1).cuda()
+        args.mean = torch.tensor([0.5] * 3, dtype=torch.float32).reshape(1, 3, 1, 1).cuda()
+        args.std = torch.tensor([0.5] * 3, dtype=torch.float32).reshape(1, 3, 1, 1).cuda()
         args.labels_per_class = 500
     elif args.dataset == 'cifar10':
         stride = 1
         args.mean = torch.tensor([x / 255 for x in [125.3, 123.0, 113.9]],
-                                 dtype=torch.float32).reshape(1, 3, 1,
-                                                              1).cuda()
+                                 dtype=torch.float32).reshape(1, 3, 1, 1).cuda()
         args.std = torch.tensor([x / 255 for x in [63.0, 62.1, 66.7]],
-                                dtype=torch.float32).reshape(1, 3, 1,
-                                                             1).cuda()
+                                dtype=torch.float32).reshape(1, 3, 1, 1).cuda()
         args.labels_per_class = 5000
     elif args.dataset == 'cifar100':
         stride = 1
         args.mean = torch.tensor([x / 255 for x in [129.3, 124.1, 112.4]],
-                                 dtype=torch.float32).reshape(1, 3, 1,
-                                                              1).cuda()
+                                 dtype=torch.float32).reshape(1, 3, 1, 1).cuda()
         args.std = torch.tensor([x / 255 for x in [68.2, 65.4, 70.4]],
-                                dtype=torch.float32).reshape(1, 3, 1,
-                                                             1).cuda()
+                                dtype=torch.float32).reshape(1, 3, 1, 1).cuda()
         args.labels_per_class = 500
     else:
         raise AssertionError('Given Dataset is not supported!')
@@ -532,14 +483,12 @@ def main():
             optimizer.load_state_dict(checkpoint['optimizer'])
             best_acc = recorder.max_accuracy(False)
             print_log(
-                "=> loaded checkpoint '{}' (epoch {})".format(
-                    args.resume, checkpoint['epoch']), log)
+                "=> loaded checkpoint '{}' (epoch {})".format(args.resume, checkpoint['epoch']),
+                log)
         else:
-            print_log("=> no checkpoint found at '{}'".format(args.resume),
-                      log)
+            print_log("=> no checkpoint found at '{}'".format(args.resume), log)
     else:
-        print_log(
-            "=> do not use any checkpoint for {} model".format(args.arch), log)
+        print_log("=> do not use any checkpoint for {} model".format(args.arch), log)
 
     if args.evaluate:
         validate(test_loader, net, log)
@@ -555,20 +504,15 @@ def main():
     test_acc = []
 
     for epoch in range(args.start_epoch, args.epochs):
-        current_learning_rate = adjust_learning_rate(optimizer, epoch,
-                                                     args.gammas,
-                                                     args.schedule)
+        current_learning_rate = adjust_learning_rate(optimizer, epoch, args.gammas, args.schedule)
 
-        need_hour, need_mins, need_secs = convert_secs2time(
-            epoch_time.avg * (args.epochs - epoch))
-        need_time = '[Need: {:02d}:{:02d}:{:02d}]'.format(
-            need_hour, need_mins, need_secs)
+        need_hour, need_mins, need_secs = convert_secs2time(epoch_time.avg * (args.epochs - epoch))
+        need_time = '[Need: {:02d}:{:02d}:{:02d}]'.format(need_hour, need_mins, need_secs)
         print_log('\n==>>{:s} [Epoch={:03d}/{:03d}] {:s} [learning_rate={:6.4f}]'.format(time_string(), epoch, args.epochs, need_time, current_learning_rate) \
                 + ' [Best : Accuracy={:.2f}, Error={:.2f}]'.format(recorder.max_accuracy(False), 100-recorder.max_accuracy(False)), log)
 
         # Train for one epoch
-        tr_acc, tr_acc5, tr_los = train(train_loader, net, optimizer, epoch,
-                                        args, log, mpp)
+        tr_acc, tr_acc5, tr_los = train(train_loader, net, optimizer, epoch, args, log, mpp)
 
         # Evaluate on validation set
         val_acc, val_los = validate(test_loader, net, log)
@@ -617,8 +561,8 @@ def main():
         np.max(test_acc[-10:]) - np.median(test_acc[-10:]),
         np.median(test_acc[-10:]) - np.min(test_acc[-10:]))
     print_log(
-        "\nfinal 10 epoch acc (median) : {:.2f} (+- {:.2f})".format(
-            np.median(test_acc[-10:]), acc_var), log)
+        "\nfinal 10 epoch acc (median) : {:.2f} (+- {:.2f})".format(np.median(test_acc[-10:]),
+                                                                    acc_var), log)
 
     if not args.log_off:
         log.close()
