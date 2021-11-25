@@ -57,8 +57,7 @@ def mixup_process_worker(out: torch.Tensor,
     return out.contiguous(), target_reweighted
 
 
-def mixup_process_worker_wrapper(q_input: mp.Queue, q_output: mp.Queue,
-                                 device: int):
+def mixup_process_worker_wrapper(q_input: mp.Queue, q_output: mp.Queue, device: int):
     """
     :param q_input:		input queue
     :param q_output:	output queue
@@ -76,9 +75,8 @@ def mixup_process_worker_wrapper(q_input: mp.Queue, q_output: mp.Queue,
         A_dist = A_dist.to(device)
 
         # Run
-        out, target_reweighted = mixup_process_worker(out, target_reweighted,
-                                                      hidden, args, sc, A_dist,
-                                                      debug)
+        out, target_reweighted = mixup_process_worker(out, target_reweighted, hidden, args, sc,
+                                                      A_dist, debug)
         # To cpu and return
         out = out.cpu()
         target_reweighted = target_reweighted.cpu()
@@ -105,8 +103,7 @@ class MixupProcessWorker:
               sc: torch.Tensor = None,
               A_dist: torch.Tensor = None,
               debug=True):
-        self.q_input.put(
-            [out, target_reweighted, hidden, args, sc, A_dist, debug])
+        self.q_input.put([out, target_reweighted, hidden, args, sc, A_dist, debug])
 
     def join(self):
         input, target = self.q_output.get()
@@ -126,10 +123,7 @@ class MixupProcessParallel:
         self.part = part
         self.batch_size = batch_size
         self.n_workers = ceil(batch_size / part)
-        self.workers = [
-            MixupProcessWorker(device=i % num_gpu)
-            for i in range(self.n_workers)
-        ]
+        self.workers = [MixupProcessWorker(device=i % num_gpu) for i in range(self.n_workers)]
 
     def __call__(self,
                  out: torch.Tensor,
@@ -153,11 +147,10 @@ class MixupProcessParallel:
         for idx in range(self.n_workers):
             self.workers[idx].start(
                 out[idx * self.part:(idx + 1) * self.part].contiguous(),
-                target_reweighted[idx * self.part:(idx + 1) *
-                                  self.part].contiguous(), hidden, args,
+                target_reweighted[idx * self.part:(idx + 1) * self.part].contiguous(), hidden, args,
                 sc[idx * self.part:(idx + 1) * self.part].contiguous(),
-                A_dist[idx * self.part:(idx + 1) * self.part, idx *
-                       self.part:(idx + 1) * self.part].contiguous(), debug)
+                A_dist[idx * self.part:(idx + 1) * self.part,
+                       idx * self.part:(idx + 1) * self.part].contiguous(), debug)
         # join
         out_list = []
         target_list = []
@@ -208,8 +201,7 @@ if __name__ == "__main__":
                                      debug=True)
 
     print((d["out"].cpu() == out.cpu()).float().mean())
-    print((d["target_reweighted"].cpu() == target_reweighted.cpu()
-           ).float().mean())
+    print((d["target_reweighted"].cpu() == target_reweighted.cpu()).float().mean())
 
     # Original run
     out0cuda = out0.cuda()
@@ -225,7 +217,6 @@ if __name__ == "__main__":
                                                debug=True)
 
     print((d["out"].cpu() == out.cpu()).float().mean())
-    print((d["target_reweighted"].cpu() == target_reweighted.cpu()
-           ).float().mean())
+    print((d["target_reweighted"].cpu() == target_reweighted.cpu()).float().mean())
 
     print("end")
