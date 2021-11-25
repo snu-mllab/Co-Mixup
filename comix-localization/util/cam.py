@@ -44,14 +44,12 @@ class CAM(nn.Module):
 
         cam = cam_weight[:, :, None, None] * feature  # bc11 * bcy'x'
 
-        cam_filter = torch.ones(1, channel, self.ksize,
-                                self.ksize).to(input.device)
+        cam_filter = torch.ones(1, channel, self.ksize, self.ksize).to(input.device)
         cam = F.conv2d(cam, cam_filter, padding=self.padding)
 
         # upsample
-        cam = F.interpolate(
-            cam, size=[input.shape[3], input.shape[2]], mode="bicubic")
+        cam = F.interpolate(cam, size=[input.shape[3], input.shape[2]], mode="bicubic")
 
         # normalize
-        cam = (cam - cam.min()) / (cam.max()-cam.min())
+        cam = (cam - cam.min()) / (cam.max() - cam.min())
         return cam
