@@ -30,14 +30,18 @@ class ImageNetTestWithCenterCropAndNormalize(data.Dataset):
         y, x, _ = input.shape
 
         # modify bbox according to resize
-        bbox[:, 0] = np.clip(bbox[:, 0] * x, (x - self.resize) / 2, x -
-                             (x - self.resize) / 2) - (x - self.resize) / 2
-        bbox[:, 1] = np.clip(bbox[:, 1] * y, (y - self.resize) / 2, y -
-                             (y - self.resize) / 2) - (y - self.resize) / 2
-        bbox[:, 2] = np.clip(bbox[:, 2] * x, (x - self.resize) / 2, x -
-                             (x - self.resize) / 2) - (x - self.resize) / 2
-        bbox[:, 3] = np.clip(bbox[:, 3] * y, (y - self.resize) / 2, y -
-                             (y - self.resize) / 2) - (y - self.resize) / 2
+        bbox[:,
+             0] = np.clip(bbox[:, 0] * x,
+                          (x - self.resize) / 2, x - (x - self.resize) / 2) - (x - self.resize) / 2
+        bbox[:,
+             1] = np.clip(bbox[:, 1] * y,
+                          (y - self.resize) / 2, y - (y - self.resize) / 2) - (y - self.resize) / 2
+        bbox[:,
+             2] = np.clip(bbox[:, 2] * x,
+                          (x - self.resize) / 2, x - (x - self.resize) / 2) - (x - self.resize) / 2
+        bbox[:,
+             3] = np.clip(bbox[:, 3] * y,
+                          (y - self.resize) / 2, y - (y - self.resize) / 2) - (y - self.resize) / 2
         bbox = bbox.astype(np.int32)
         input = self.input_transform(input)
         return input, label, bbox
@@ -52,13 +56,10 @@ if __name__ == "__main__":
     import config
     import torchvision.transforms as T
 
-    testset = ImageNetTestWithCenterCropAndNormalize(
-        config.path_dataset["clean"])
+    testset = ImageNetTestWithCenterCropAndNormalize(config.path_dataset["clean"])
     # testset = ImageNetTestWithCenterCropAndNormalize(config.path_dataset["rep"])
     # testset = ImageNetTestWithCenterCropAndNormalize(config.path_dataset["noise"])
-    testloader = data.DataLoader(testset,
-                                 sampler=FixedSubsetSampler(torch.arange(
-                                     0, 10)))
+    testloader = data.DataLoader(testset, sampler=FixedSubsetSampler(torch.arange(0, 10)))
 
     denorm = Denorm()
     for input, label, bbox_gt in testloader:
