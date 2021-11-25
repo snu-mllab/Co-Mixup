@@ -367,8 +367,7 @@ if __name__ == '__main__':
             obj_exact = cost_matrix.sum()
             # obj_exact = brute_force(cost_matrix, n_output, beta, gamma, idx_list)
             obj_exact_list.append(obj_exact)
-            print("obj (exact): {:.3f}".format(obj_exact))
-            print()
+            print("obj (exact): {:.3f}\n".format(obj_exact))
 
             output_list.append(output)
             target_list.append(target)
