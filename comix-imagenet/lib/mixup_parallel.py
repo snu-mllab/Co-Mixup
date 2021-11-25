@@ -18,12 +18,10 @@ def mixup_process_worker_wrapper(q_input: mp.Queue, q_output: mp.Queue):
     # device = torch.device(f"cuda:0")
     while True:
         # get args
-        key, out, target_reweighted, param_list, sc, A_dist, device = q_input.get(
-        )
+        key, out, target_reweighted, param_list, sc, A_dist, device = q_input.get()
 
         # run
-        out, target_reweighted = mixup_match(out, target_reweighted,
-                                             param_list, sc, A_dist, device)
+        out, target_reweighted = mixup_match(out, target_reweighted, param_list, sc, A_dist, device)
 
         # return args
         q_output.put([key, out, target_reweighted])
@@ -49,8 +47,7 @@ class MixupProcessWorker:
               sc: torch.Tensor = None,
               A_dist: torch.Tensor = None,
               device="cuda"):
-        self.q_input.put(
-            [key, out, target_reweighted, param_list, sc, A_dist, device])
+        self.q_input.put([key, out, target_reweighted, param_list, sc, A_dist, device])
 
     def join(self):
         key, input, target = self.q_output.get()
@@ -96,11 +93,10 @@ class MixupProcessParallel:
         for idx in range(num_chunk):
             self.workers[idx % self.num_thread].start(
                 idx, out[idx * self.part:(idx + 1) * self.part].contiguous(),
-                target_reweighted[idx * self.part:(idx + 1) *
-                                  self.part].contiguous(), param_list,
+                target_reweighted[idx * self.part:(idx + 1) * self.part].contiguous(), param_list,
                 sc[idx * self.part:(idx + 1) * self.part].contiguous(),
-                A_dist[idx * self.part:(idx + 1) * self.part, idx *
-                       self.part:(idx + 1) * self.part].contiguous(), device)
+                A_dist[idx * self.part:(idx + 1) * self.part,
+                       idx * self.part:(idx + 1) * self.part].contiguous(), device)
         # join
         out_list = [None] * num_chunk
         target_list = [None] * num_chunk
@@ -150,24 +146,15 @@ if __name__ == "__main__":
     # for cuda initialize
     torch.ones(3).cuda()
     for iter in tqdm(range(1), desc="initialize"):
-        out, target_reweighted = mpp(out0,
-                                     target_reweighted0,
-                                     param_list,
-                                     sc=sc,
-                                     A_dist=A_dist)
+        out, target_reweighted = mpp(out0, target_reweighted0, param_list, sc=sc, A_dist=A_dist)
 
     # parallel run
     for iter in tqdm(range(100), desc="parallel"):
-        out, target_reweighted = mpp(out0,
-                                     target_reweighted0,
-                                     param_list,
-                                     sc=sc,
-                                     A_dist=A_dist)
+        out, target_reweighted = mpp(out0, target_reweighted0, param_list, sc=sc, A_dist=A_dist)
 
     # chk sanity
     print((d["input"].cpu() == out.cpu()).float().mean())
-    print((d["target_reweighted"].cpu() == target_reweighted.cpu()
-           ).float().mean())
+    print((d["target_reweighted"].cpu() == target_reweighted.cpu()).float().mean())
 
     # original run
     for iter in tqdm(range(100), desc="original"):
@@ -179,8 +166,7 @@ if __name__ == "__main__":
 
     # chk sanity
     print((d["input"].cpu() == out.cpu()).float().mean())
-    print((d["target_reweighted"].cpu() == target_reweighted.cpu()
-           ).float().mean())
+    print((d["target_reweighted"].cpu() == target_reweighted.cpu()).float().mean())
 
     print("end")
 
