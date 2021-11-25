@@ -22,16 +22,15 @@ class BboxGenerator(nn.Module):
         return: [1,4], torch.float32
                 the last for channel means x0,y0,x1,y1
         '''
-        gray_heatmap = np.clip((cam - cam.min()) / (cam.max() - cam.min())
-                               * 255, 0, 255).astype(np.uint8)  # np.uint8, yx, 0~255
+        gray_heatmap = np.clip((cam - cam.min()) / (cam.max() - cam.min()) * 255, 0,
+                               255).astype(np.uint8)  # np.uint8, yx, 0~255
 
-        _, thr_gray_heatmap = cv2.threshold(gray_heatmap, int(
-            thr_val * np.max(gray_heatmap)), 255, cv2.THRESH_BINARY)
+        _, thr_gray_heatmap = cv2.threshold(gray_heatmap, int(thr_val * np.max(gray_heatmap)), 255,
+                                            cv2.THRESH_BINARY)
 
-        contours = cv2.findContours(
-            image=thr_gray_heatmap,
-            mode=cv2.RETR_TREE,
-            method=cv2.CHAIN_APPROX_SIMPLE)[_CONTOUR_INDEX]
+        contours = cv2.findContours(image=thr_gray_heatmap,
+                                    mode=cv2.RETR_TREE,
+                                    method=cv2.CHAIN_APPROX_SIMPLE)[_CONTOUR_INDEX]
 
         if len(contours) != 0:
             c = max(contours, key=cv2.contourArea)
@@ -51,8 +50,8 @@ class BboxGenerator(nn.Module):
         device = cam.device
         out = []
         for i in range(cam.shape[0]):
-            bbox = self.generate_bbox(cam[i].detach().cpu().numpy(
-            ).transpose(1, 2, 0), self.th)  # torch.float32 [1,4]
+            bbox = self.generate_bbox(cam[i].detach().cpu().numpy().transpose(1, 2, 0),
+                                      self.th)  # torch.float32 [1,4]
             out.append(bbox.to(device))
         out = torch.stack(out)  # torch.float32 [b,1,4]
         return out
