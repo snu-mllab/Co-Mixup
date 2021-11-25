@@ -257,7 +257,7 @@ def get_onehot_matrix(cost_matrix,
 
 
 if __name__ == '__main__':
-    # Some test for debugging and computation time.
+    # Some test for debugging and computation time
     import time
     import argparse
 
