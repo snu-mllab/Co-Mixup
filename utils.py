@@ -2,6 +2,7 @@ import time
 import torch
 import numpy as np
 import matplotlib
+
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import random
@@ -34,8 +35,7 @@ class RecorderMeter(object):
         assert total_epoch > 0
         self.total_epoch = total_epoch
         self.current_epoch = 0
-        self.epoch_losses = np.zeros((self.total_epoch, 2),
-                                     dtype=np.float32)  # [epoch, train/val]
+        self.epoch_losses = np.zeros((self.total_epoch, 2), dtype=np.float32)  # [epoch, train/val]
         self.epoch_losses = self.epoch_losses - 1
 
         self.epoch_accuracy = np.zeros((self.total_epoch, 2),
@@ -81,39 +81,19 @@ class RecorderMeter(object):
         plt.ylabel('accuracy', fontsize=16)
 
         y_axis[:] = self.epoch_accuracy[:, 0]
-        plt.plot(x_axis,
-                 y_axis,
-                 color='g',
-                 linestyle='-',
-                 label='train-accuracy',
-                 lw=2)
+        plt.plot(x_axis, y_axis, color='g', linestyle='-', label='train-accuracy', lw=2)
         plt.legend(loc=4, fontsize=legend_fontsize)
 
         y_axis[:] = self.epoch_accuracy[:, 1]
-        plt.plot(x_axis,
-                 y_axis,
-                 color='y',
-                 linestyle='-',
-                 label='valid-accuracy',
-                 lw=2)
+        plt.plot(x_axis, y_axis, color='y', linestyle='-', label='valid-accuracy', lw=2)
         plt.legend(loc=4, fontsize=legend_fontsize)
 
         y_axis[:] = self.epoch_losses[:, 0]
-        plt.plot(x_axis,
-                 y_axis * 50,
-                 color='g',
-                 linestyle=':',
-                 label='train-loss-x50',
-                 lw=2)
+        plt.plot(x_axis, y_axis * 50, color='g', linestyle=':', label='train-loss-x50', lw=2)
         plt.legend(loc=4, fontsize=legend_fontsize)
 
         y_axis[:] = self.epoch_losses[:, 1]
-        plt.plot(x_axis,
-                 y_axis * 50,
-                 color='y',
-                 linestyle=':',
-                 label='valid-loss-x50',
-                 lw=2)
+        plt.plot(x_axis, y_axis * 50, color='y', linestyle=':', label='valid-loss-x50', lw=2)
         plt.legend(loc=4, fontsize=legend_fontsize)
 
         if save_path is not None:
@@ -124,8 +104,7 @@ class RecorderMeter(object):
 
 def time_string():
     ISOTIMEFORMAT = '%Y-%m-%d %X'
-    string = '[{}]'.format(
-        time.strftime(ISOTIMEFORMAT, time.gmtime(time.time())))
+    string = '[{}]'.format(time.strftime(ISOTIMEFORMAT, time.gmtime(time.time())))
     return string
 
 
@@ -138,15 +117,12 @@ def convert_secs2time(epoch_time):
 
 def time_file_str():
     ISOTIMEFORMAT = '%Y-%m-%d'
-    string = '{}'.format(time.strftime(ISOTIMEFORMAT,
-                                       time.gmtime(time.time())))
+    string = '{}'.format(time.strftime(ISOTIMEFORMAT, time.gmtime(time.time())))
     return string + '-{}'.format(random.randint(1, 10000))
 
 
 def to_one_hot(inp, num_classes, device='cuda'):
-    y_onehot = torch.zeros((inp.size(0), num_classes),
-                           dtype=torch.float32,
-                           device=device)
+    y_onehot = torch.zeros((inp.size(0), num_classes), dtype=torch.float32, device=device)
     y_onehot.scatter_(1, inp.unsqueeze(1), 1)
 
     return y_onehot
