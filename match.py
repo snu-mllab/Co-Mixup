@@ -335,7 +335,6 @@ if __name__ == '__main__':
         loss_last = []
 
         for i in range(n_output // n_part):
-            # s = time.time()
             mask_onehot = get_onehot_matrix(cost_matrix[i * n_part:(i + 1) * n_part].detach(),
                                             A[i * n_part:(i + 1) * n_part,
                                               i * n_part:(i + 1) * n_part],
