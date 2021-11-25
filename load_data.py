@@ -10,22 +10,17 @@ from operator import __or__
 # Random sampler
 def get_sampler(labels, n_labels, n=None, n_valid=None):
     # Only choose digits in n_labels
-    (indices, ) = np.where(
-        reduce(__or__, [labels == i for i in np.arange(n_labels)]))
+    (indices, ) = np.where(reduce(__or__, [labels == i for i in np.arange(n_labels)]))
     np.random.shuffle(indices)
 
-    indices_valid = np.hstack([
-        list(filter(lambda idx: labels[idx] == i, indices))[:n_valid]
-        for i in range(n_labels)
-    ])
+    indices_valid = np.hstack(
+        [list(filter(lambda idx: labels[idx] == i, indices))[:n_valid] for i in range(n_labels)])
     indices_train = np.hstack([
-        list(filter(lambda idx: labels[idx] == i,
-                    indices))[n_valid:n_valid + n] for i in range(n_labels)
-    ])
-    indices_unlabelled = np.hstack([
-        list(filter(lambda idx: labels[idx] == i, indices))[:]
+        list(filter(lambda idx: labels[idx] == i, indices))[n_valid:n_valid + n]
         for i in range(n_labels)
     ])
+    indices_unlabelled = np.hstack(
+        [list(filter(lambda idx: labels[idx] == i, indices))[:] for i in range(n_labels)])
 
     indices_train = torch.from_numpy(indices_train)
     indices_valid = torch.from_numpy(indices_valid)
@@ -65,8 +60,7 @@ def load_data_subset(batch_size,
         ])
 
         test_transform = transforms.Compose(
-            [transforms.ToTensor(),
-             transforms.Normalize(mean, std)])
+            [transforms.ToTensor(), transforms.Normalize(mean, std)])
     else:
         train_transform = transforms.Compose([
             transforms.RandomHorizontalFlip(),
@@ -76,8 +70,7 @@ def load_data_subset(batch_size,
         ])
 
         test_transform = transforms.Compose(
-            [transforms.ToTensor(),
-             transforms.Normalize(mean, std)])
+            [transforms.ToTensor(), transforms.Normalize(mean, std)])
 
     # Dataset
     if dataset == 'cifar10':
@@ -101,15 +94,12 @@ def load_data_subset(batch_size,
                                       download=True)
         num_classes = 100
     elif dataset == 'tiny-imagenet-200':
-        train_root = os.path.join(
-            data_target_dir, 'train')  # this is path to training images folder
-        validation_root = os.path.join(
-            data_target_dir,
-            'val/images')  # this is path to validation images folder
-        train_data = datasets.ImageFolder(train_root,
-                                          transform=train_transform)
-        test_data = datasets.ImageFolder(validation_root,
-                                         transform=test_transform)
+        train_root = os.path.join(data_target_dir,
+                                  'train')  # this is path to training images folder
+        validation_root = os.path.join(data_target_dir,
+                                       'val/images')  # this is path to validation images folder
+        train_data = datasets.ImageFolder(train_root, transform=train_transform)
+        test_data = datasets.ImageFolder(validation_root, transform=test_transform)
         num_classes = 200
     else:
         assert False, 'Do not support dataset : {}'.format(dataset)
@@ -118,8 +108,7 @@ def load_data_subset(batch_size,
         pass
     else:
         train_sampler, valid_sampler, unlabelled_sampler = get_sampler(
-            train_data.targets, num_classes, labels_per_class,
-            valid_labels_per_class)
+            train_data.targets, num_classes, labels_per_class, valid_labels_per_class)
 
     # Dataloader
     if dataset == 'tiny-imagenet-200':
@@ -170,12 +159,9 @@ def create_val_folder(data_set_path):
     This method is responsible for separating validation images into separate sub folders,
     so that test and val data can be read by the pytorch dataloaders
     """
-    path = os.path.join(
-        data_set_path,
-        'val/images')  # path where validation data is present now
-    filename = os.path.join(
-        data_set_path,
-        'val/val_annotations.txt')  # file where image2class mapping is present
+    path = os.path.join(data_set_path, 'val/images')  # path where validation data is present now
+    filename = os.path.join(data_set_path,
+                            'val/val_annotations.txt')  # file where image2class mapping is present
     fp = open(filename, "r")
     data = fp.readlines()
 
