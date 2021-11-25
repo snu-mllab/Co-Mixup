@@ -128,7 +128,6 @@ class AverageMeter(object):
 
 
 def plotting(exp_dir):
-    # Load the training log dictionary:
     train_dict = pickle.load(open(os.path.join(exp_dir, 'log.pkl'), 'rb'))
 
     plt.plot(np.asarray(train_dict['train_loss']), label='train_loss')
