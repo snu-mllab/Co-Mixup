@@ -22,26 +22,18 @@ parser.add_argument(
     help=
     "result directory. if None, the directory will be ./result/resnet50@{model name}@{dataset name}"
 )
-parser.add_argument(
-    "--model_name",
-    type=str,
-    default="vanilla",
-    choices=[
-        "vanilla", "inputmix", "cutmix", "manifold", "puzmix", "comix-blk4"
-    ],
-    help="pretrained model name. the corresponding path reside in config.py")
+parser.add_argument("--model_name",
+                    type=str,
+                    default="vanilla",
+                    choices=["vanilla", "inputmix", "cutmix", "manifold", "puzmix", "comix-blk4"],
+                    help="pretrained model name. the corresponding path reside in config.py")
 parser.add_argument(
     "--data_name",
     type=str,
     default="clean",
     choices=["clean", "rep", "noise"],
-    help=
-    "name for clean or corrupted dataset. the corresponding path reside in config.py"
-)
-parser.add_argument("--th",
-                    type=float,
-                    default=0.25,
-                    help="CAM threshold. 0~1 value")
+    help="name for clean or corrupted dataset. the corresponding path reside in config.py")
+parser.add_argument("--th", type=float, default=0.25, help="CAM threshold. 0~1 value")
 parser.add_argument("--debug", type=int, default=0, help="debug flag")
 parser.add_argument("--tqdm", type=int, default=0, help="on/off tqdm")
 
@@ -49,8 +41,7 @@ args = parser.parse_args()
 
 # ---------------------------- setup ---------------------------- #
 if args.root_dir is None:
-    args.root_dir = config.path_result_format.format(args.model_name,
-                                                     args.data_name)
+    args.root_dir = config.path_result_format.format(args.model_name, args.data_name)
 mkdir(args.root_dir)
 
 lg = Logger()
@@ -142,9 +133,8 @@ with torch.no_grad():
         if idx % 500 == 0:
             lg.info(msg)
     lg.info(msg)
-    torch.save(
-        {
-            "top1": top1_meter.avg,
-            "top5": top5_meter.avg,
-            "top1-loc": top1_loc_meter.avg
-        }, join(args.root_dir, f"result.pt"))
+    torch.save({
+        "top1": top1_meter.avg,
+        "top5": top5_meter.avg,
+        "top1-loc": top1_loc_meter.avg
+    }, join(args.root_dir, f"result.pt"))
