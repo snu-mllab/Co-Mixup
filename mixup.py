@@ -30,12 +30,10 @@ def mixup_process(out, target_reweighted, args=None, sc=None, A_dist=None):
     for i in range(ceil(batch_size / m_part)):
         with torch.no_grad():
             sc_part = sc[i * m_part:(i + 1) * m_part]
-            A_dist_part = A_dist[i * m_part:(i + 1) * m_part, i *
-                                 m_part:(i + 1) * m_part]
+            A_dist_part = A_dist[i * m_part:(i + 1) * m_part, i * m_part:(i + 1) * m_part]
 
             n_input = sc_part.shape[0]
-            sc_norm = sc_part / sc_part.reshape(n_input, -1).sum(1).reshape(
-                n_input, 1, 1)
+            sc_norm = sc_part / sc_part.reshape(n_input, -1).sum(1).reshape(n_input, 1, 1)
             cost_matrix = -sc_norm
 
             A_base = torch.eye(n_input, device=out.device)
@@ -57,9 +55,8 @@ def mixup_process(out, target_reweighted, args=None, sc=None, A_dist=None):
                                             device='cuda')
 
         # Generate image and corrsponding soft target
-        output_part, target_part = mix_input(
-            mask_onehot, out[i * m_part:(i + 1) * m_part],
-            target_reweighted[i * m_part:(i + 1) * m_part])
+        output_part, target_part = mix_input(mask_onehot, out[i * m_part:(i + 1) * m_part],
+                                             target_reweighted[i * m_part:(i + 1) * m_part])
 
         out_list.append(output_part)
         target_list.append(target_part)
