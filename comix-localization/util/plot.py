@@ -36,9 +36,9 @@ def imshowc_bbox(imgs, bboxs, nx=None, color="r", mode="pascal", path=None):
     if nx is None:
         nx = min(10, len(imgs))
 
-    ny = (len(imgs)-1)//nx + 1
+    ny = (len(imgs) - 1) // nx + 1
     for idx, (img, bbox) in enumerate(zip(imgs, bboxs)):
-        plt.subplot(ny, nx, idx+1)
+        plt.subplot(ny, nx, idx + 1)
 
         # img
         fig = plt.imshow(img, vmin=0, vmax=1)
@@ -52,8 +52,7 @@ def imshowc_bbox(imgs, bboxs, nx=None, color="r", mode="pascal", path=None):
             elif mode == "pascal":
                 x, y, w, h = bbox2[0], bbox2[1], bbox2[2] - \
                     bbox2[0], bbox2[3]-bbox2[1]
-            rect = patches.Rectangle(
-                (x, y), w, h, edgecolor=color, facecolor="none")
+            rect = patches.Rectangle((x, y), w, h, edgecolor=color, facecolor="none")
             ax.add_patch(rect)
         fig.axes.get_xaxis().set_visible(False)
         fig.axes.get_yaxis().set_visible(False)
@@ -86,12 +85,12 @@ if __name__ == "__main__":
     # bboxs = [torch.tensor([[100,100,110,110]]), torch.tensor([[100,100,110,110]])]
     # imshowc_bbox(imgs, bboxs)
 
-    imgs = torch.arange(1*128*128*3).reshape(1, 3, 128, 128) / (1*128*128*3)
+    imgs = torch.arange(1 * 128 * 128 * 3).reshape(1, 3, 128, 128) / (1 * 128 * 128 * 3)
     bboxs = torch.tensor([[[0, 0, 50, 50], [10, 10, 60, 60]]])
     # imshowc_bbox(imgs, bboxs, path="test0.jpg")
     imshowc_bbox(imgs, bboxs)
 
-    imgs = torch.arange(1*128*128*3).reshape(1, 3, 128, 128) / (1*128*128*3)
+    imgs = torch.arange(1 * 128 * 128 * 3).reshape(1, 3, 128, 128) / (1 * 128 * 128 * 3)
     bboxs = torch.tensor([[[50, 50, 100, 100]]])
     # imshowc_bbox(imgs, bboxs, path="test1.jpg")
     imshowc_bbox(imgs, bboxs)
