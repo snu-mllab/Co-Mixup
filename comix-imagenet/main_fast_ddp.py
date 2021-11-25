@@ -28,6 +28,7 @@ import torch.multiprocessing as mp
 from tqdm import tqdm
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 
@@ -132,27 +133,16 @@ def main(rank, configs, world_size):
         for p in m.parameters(recurse=False):
             param_to_moduleName[p] = str(type(m).__name__)
 
-    group_decay = [
-        p for p in model.parameters()
-        if 'BatchNorm' not in param_to_moduleName[p]
-    ]
-    group_no_decay = [
-        p for p in model.parameters() if 'BatchNorm' in param_to_moduleName[p]
-    ]
-    groups = [
-        dict(params=group_decay),
-        dict(params=group_no_decay, weight_decay=0)
-    ]
+    group_decay = [p for p in model.parameters() if 'BatchNorm' not in param_to_moduleName[p]]
+    group_no_decay = [p for p in model.parameters() if 'BatchNorm' in param_to_moduleName[p]]
+    groups = [dict(params=group_decay), dict(params=group_no_decay, weight_decay=0)]
     optimizer = torch.optim.SGD(groups,
                                 0,
                                 momentum=configs.TRAIN.momentum,
                                 weight_decay=configs.TRAIN.weight_decay)
 
     if not configs.evaluate:
-        model, optimizer = amp.initialize(model,
-                                          optimizer,
-                                          opt_level="O1",
-                                          loss_scale=1024)
+        model, optimizer = amp.initialize(model, optimizer, opt_level="O1", loss_scale=1024)
 
     model = DDP(model, device_ids=[0])
 
@@ -165,8 +155,8 @@ def main(rank, configs, world_size):
             best_prec1 = checkpoint['best_prec1']
             model.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
-            print("=> loaded checkpoint '{}' (epoch {})".format(
-                configs.resume, checkpoint['epoch']))
+            print("=> loaded checkpoint '{}' (epoch {})".format(configs.resume,
+                                                                checkpoint['epoch']))
         else:
             print("=> no checkpoint found at '{}'".format(configs.resume))
 
@@ -175,8 +165,7 @@ def main(rank, configs, world_size):
     valdir = os.path.join(configs.data, 'val')
 
     train_transform = transforms.Compose([
-        transforms.RandomResizedCrop(configs.DATA.crop_size,
-                                     scale=(configs.DATA.min_scale, 1.0)),
+        transforms.RandomResizedCrop(configs.DATA.crop_size, scale=(configs.DATA.min_scale, 1.0)),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor()
     ])
@@ -189,28 +178,25 @@ def main(rank, configs, world_size):
 
     train_dataset = datasets.ImageFolder(traindir, train_transform)
     train_sampler = DistributedSampler(train_dataset)
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset,
-        batch_size=configs.DATA.batch_size,
-        num_workers=configs.DATA.workers,
-        pin_memory=True,
-        sampler=train_sampler,
-        drop_last=True)
+    train_loader = torch.utils.data.DataLoader(train_dataset,
+                                               batch_size=configs.DATA.batch_size,
+                                               num_workers=configs.DATA.workers,
+                                               pin_memory=True,
+                                               sampler=train_sampler,
+                                               drop_last=True)
 
-    val_loader = torch.utils.data.DataLoader(
-        datasets.ImageFolder(valdir, test_transform),
-        batch_size=configs.DATA.batch_size,
-        shuffle=False,
-        num_workers=configs.DATA.workers,
-        pin_memory=True,
-        drop_last=False)
+    val_loader = torch.utils.data.DataLoader(datasets.ImageFolder(valdir, test_transform),
+                                             batch_size=configs.DATA.batch_size,
+                                             shuffle=False,
+                                             num_workers=configs.DATA.workers,
+                                             pin_memory=True,
+                                             drop_last=False)
 
     if configs.evaluate:
         validate(rank, val_loader, model, criterion, configs, logger)
         return
 
-    lr_schedule = lambda t: np.interp([t], configs.TRAIN.lr_epochs, configs.
-                                      TRAIN.lr_values)[0]
+    lr_schedule = lambda t: np.interp([t], configs.TRAIN.lr_epochs, configs.TRAIN.lr_values)[0]
 
     # mixup parallel
     mpp = MixupProcessParallel(part=16, num_thread=3)
@@ -219,8 +205,8 @@ def main(rank, configs, world_size):
         train_sampler.set_epoch(epoch)  # for ddp training
 
         # train for one epoch
-        train(rank, mpp, print, configs, criterion, criterion_batch,
-              train_loader, model, optimizer, epoch, lr_schedule)
+        train(rank, mpp, print, configs, criterion, criterion_batch, train_loader, model, optimizer,
+              epoch, lr_schedule)
 
         # evaluate on validation set
         prec1 = validate(rank, val_loader, model, criterion, configs, logger)
@@ -236,8 +222,7 @@ def main(rank, configs, world_size):
                     'state_dict': model.state_dict(),
                     'best_prec1': best_prec1,
                     'optimizer': optimizer.state_dict(),
-                }, is_best,
-                os.path.join('trained_models', f'{configs.output_name}'))
+                }, is_best, os.path.join('trained_models', f'{configs.output_name}'))
         dist.barrier()
         # break #@debug
     print("end epoch")
@@ -247,12 +232,10 @@ def main(rank, configs, world_size):
     print("end cleanup")
 
 
-def train(rank, mpp: MixupProcessParallel, print, configs, criterion,
-          criterion_batch, train_loader, model, optimizer, epoch, lr_schedule):
-    mean = torch.Tensor(
-        np.array(configs.TRAIN.mean)[:, np.newaxis, np.newaxis])
-    mean = mean.expand(3, configs.DATA.crop_size,
-                       configs.DATA.crop_size).cuda()
+def train(rank, mpp: MixupProcessParallel, print, configs, criterion, criterion_batch, train_loader,
+          model, optimizer, epoch, lr_schedule):
+    mean = torch.Tensor(np.array(configs.TRAIN.mean)[:, np.newaxis, np.newaxis])
+    mean = mean.expand(3, configs.DATA.crop_size, configs.DATA.crop_size).cuda()
     std = torch.Tensor(np.array(configs.TRAIN.std)[:, np.newaxis, np.newaxis])
     std = std.expand(3, configs.DATA.crop_size, configs.DATA.crop_size).cuda()
 
@@ -321,14 +304,12 @@ def train(rank, mpp: MixupProcessParallel, print, configs, criterion,
             z_idx_2d[:, 0] = z_idx_1d // z.shape[-1]
             z_idx_2d[:, 1] = z_idx_1d % z.shape[-1]
             A_dist = distance(z_idx_2d, dist_type='l1').cuda()
-            
+
             # parallel
-            input, target_reweighted = mpp(input, target_reweighted,
-                                           param_list, unary, A_dist)
+            input, target_reweighted = mpp(input, target_reweighted, param_list, unary, A_dist)
 
         output = model(input)
-        loss = torch.mean(
-            torch.sum(-target_reweighted * nn.LogSoftmax(-1)(output), dim=1))
+        loss = torch.mean(torch.sum(-target_reweighted * nn.LogSoftmax(-1)(output), dim=1))
 
         # compute gradient and do SGD step
         if configs.TRAIN.clean_lam == 0:
