@@ -15,7 +15,7 @@ year={2021}
 ```
 
 ## Requirements
-This code is tested with  
+This code was tested with  
 python 3.7.6   
 pytorch 1.7.0    
 torchvision 0.8.1    
